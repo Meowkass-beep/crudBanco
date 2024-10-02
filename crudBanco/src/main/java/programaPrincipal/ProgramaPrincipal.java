@@ -7,6 +7,7 @@ import org.apache.log4j.BasicConfigurator;
 import console.Console;
 import usuario.GerenciarUsuario;
 import usuario.Usuario;
+import usuario.endereco.Endereco;
 
 public class ProgramaPrincipal {
 
@@ -37,16 +38,16 @@ public class ProgramaPrincipal {
 			opcao = console.readInt();
 
 			if (opcao == CADASTRAR) {
-				System.out.println("Cadastrar usuário");
+				console.printMessage("Cadastrar usuário");
 				cadastrar();
 			} else if (opcao == EDITAR) {
-				System.out.println("Editar usuário");
+				console.printMessage("Editar usuário");
 				editar();
 			} else if (opcao == LISTAR) {
-				System.out.println("Listar usuários");
+				console.printMessage("Listar usuários");
 				listar();
 			} else if (opcao == REMOVER) {
-				System.out.println("Remover usuário");
+				console.printMessage("Remover usuário");
 				remover();
 			}
 
@@ -54,21 +55,53 @@ public class ProgramaPrincipal {
 		gerUsuario.fecharConexao();
 	}
 
-	private void editar() {
-		console.printMessage("Digite o ID para editar: ");
+	private void lerDadosUsuario(Usuario usuario) {
+		console.printMessage("Digite o seu nome: ");
+		String novoNome = console.readLine();
+		console.printMessage("Digite o seu e-mail: ");
+		String novoEmail = console.readLine();
+		console.printMessage("Digite o seu CPF: ");
+		long novoCpf = console.readLong();
+		console.printMessage("Digite a sua senha: ");
+		String novaSenha = console.readLine();
 
-		int id = console.readInt();
+		usuario.setNome(novoNome);
+		usuario.setEmail(novoEmail);
+		usuario.setCpf(novoCpf);
+		usuario.setSenha(novaSenha);
+
+		lerDadosEndereco(usuario);
+	}
+	
+	private void lerDadosEndereco(Usuario usuario) {
+		Endereco endereco = usuario.getEndereco();
+
+		if (endereco == null) {
+			endereco = new Endereco();
+		}
+
+		String logradouro = console.readLine("Digite o logradouro:");
+		String cep = console.readLine("Digite o CEP:");
+		String numero = console.readLine("Digite o número:");
+
+		endereco.setCep(cep);
+		endereco.setLogradouro(logradouro);
+		endereco.setNumero(numero);
+		
+		usuario.setEndereco(endereco);
+		
+	}
+
+	private void editar() {
+
+		int id = console.readInt("Digite o ID para editar: ");
 
 		Usuario usuario = gerUsuario.findById(id);
 
-		console.printMessage("Digite o novo nome: ");
-		String novoNome = console.readLine();
-		console.printMessage("Digite o novo e-mail: ");
-		String novoEmail = console.readLine();
-		console.printMessage("Digite o novo CPF: ");
-		long novoCpf = console.readLong();
-		console.printMessage("Digite a nova senha: ");
-		String novaSenha = console.readLine();
+		String novoNome = console.readLine("Digite o novo nome: ");
+		String novoEmail = console.readLine("Digite o novo e-mail: ");
+		long novoCpf = console.readLong("Digite o novo CPF: ");
+		String novaSenha = console.readLine("Digite a nova senha: ");
 
 		usuario.setNome(novoNome);
 		usuario.setEmail(novoEmail);
@@ -81,9 +114,7 @@ public class ProgramaPrincipal {
 	}
 
 	private void remover() {
-		console.printMessage("Digite o id para remover: ");
-
-		int idRemover = console.readInt();
+		int idRemover = console.readInt("Digite o id para remover: ");
 
 		Usuario usuario = gerUsuario.findById(idRemover);
 		if (usuario == null) {
@@ -111,40 +142,30 @@ public class ProgramaPrincipal {
 	private void listar() {
 		List<Usuario> lista = gerUsuario.list();
 		for (Usuario usuario : lista) {
-			console.printMessage("Id: " + usuario.getId() + "\nNome: " + usuario.getNome() + "\nEmail: "
-					+ usuario.getEmail() + "\nCpf: " + usuario.getCpf() + "\nSenha: " + usuario.getSenha());
+			console.printMessage("Id: " + usuario.getId() + 
+					"\nNome: " + usuario.getNome() + 
+					"\nEmail: " + usuario.getEmail() + 
+					"\nCpf: " + usuario.getCpf() + 
+					"\nSenha: " + usuario.getSenha());
 		}
 	}
 
 	private void cadastrar() {
-
-		console.printMessage("Digite o seu nome: ");
-		String novoNome = console.readLine();
-		console.printMessage("Digite o seu e-mail: ");
-		String novoEmail = console.readLine();
-		console.printMessage("Digite o seu CPF: ");
-		long novoCpf = console.readLong();
-		console.printMessage("Digite a sua senha: ");
-		String novaSenha = console.readLine();
-
 		Usuario usuario = new Usuario();
 
-		usuario.setNome(novoNome);
-		usuario.setEmail(novoEmail);
-		usuario.setCpf(novoCpf);
-		usuario.setSenha(novaSenha);
+		lerDadosUsuario(usuario);
 
 		gerUsuario.create(usuario);
 		console.printMessage("Usuário cadastro com sucesso");
 	}
 
 	private void mostrarMenu() {
-		System.out.println("\n------ SUPER CRUD ------\n");
-		System.out.println("1 - Cadastrar usuário");
-		System.out.println("2 - Editar usuário");
-		System.out.println("3 - Listar usuários");
-		System.out.println("4 - Remover usuário");
-		System.out.println("9 - Sair");
+		console.printMessage("\n------ SUPER CRUD ------\n");
+		console.printMessage("1 - Cadastrar usuário");
+		console.printMessage("2 - Editar usuário");
+		console.printMessage("3 - Listar usuários");
+		console.printMessage("4 - Remover usuário");
+		console.printMessage("9 - Sair");
 	}
 
 }
